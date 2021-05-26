@@ -10,10 +10,14 @@ import timber.log.Timber
 
 internal class HttpUriFetcher(callFactory: Call.Factory) : HttpFetcher<Uri>(callFactory) {
     override fun Uri.toHttpUrl(): HttpUrl = toString().toHttpUrl()
+
+    override fun key(data: Uri): String = data.toString()
 }
 
 internal class HttpUrlFetcher(callFactory: Call.Factory) : HttpFetcher<HttpUrl>(callFactory) {
     override fun HttpUrl.toHttpUrl(): HttpUrl = this
+
+    override fun key(data: HttpUrl): String = data.toString()
 }
 
 internal abstract class HttpFetcher<T : Any>(private val callFactory: Call.Factory) : Fetcher<T> {

@@ -1,7 +1,9 @@
 package com.seagroup.seatalk.shopil
 
 import android.content.Context
+import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
+import androidx.core.graphics.drawable.toDrawable
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -16,7 +18,8 @@ import timber.log.Timber
 import kotlin.coroutines.coroutineContext
 
 class ImageLoaderImpl(
-    private val appContext: Context
+    private val appContext: Context,
+    private val memoryCache: MemoryCache
 ) : ImageLoader {
 
     private val scope = CoroutineScope(
@@ -26,22 +29,33 @@ class ImageLoaderImpl(
 
     override fun enqueue(request: ImageRequest) {
         scope.launch {
-            // TODO: Check the memory cache.
+            val callFactory = OkHttpClient.Builder()
+                .cache(StorageUtils.createDefaultCache(appContext))
+                .build()
+            val fetcher = HttpUrlFetcher(callFactory)
+            val memoryCacheKey = MemoryCache.Key(fetcher.key(request.imgUrl.toHttpUrl()))
+            val value = memoryCache[memoryCacheKey]
+            if (value != null) {
+                Timber.d("get value from memory cache")
+                request.imageView.setImageDrawable(
+                    value.toDrawable(appContext.resources)
+                )
+                return@launch
+            }
 
             // Fetch, decode, transform, and cache the image on a background dispatcher.
             val drawable = withContext(Dispatchers.IO) {
-                execute(request)
+                execute(request, fetcher)
+                    .also {
+                        val bitmap = (it as? BitmapDrawable)?.bitmap ?: return@also
+                        memoryCache[memoryCacheKey] = bitmap
+                    }
             }
             request.imageView.setImageDrawable(drawable)
         }
     }
 
-    private suspend fun execute(request: ImageRequest): Drawable {
-        val callFactory = OkHttpClient.Builder()
-            .cache(StorageUtils.createDefaultCache(appContext))
-            .build()
-        val fetcher = HttpUrlFetcher(callFactory)
-
+    private suspend fun execute(request: ImageRequest, fetcher: HttpUrlFetcher): Drawable {
         return when (val fetchResult = fetcher.fetch(request.imgUrl.toHttpUrl())) {
             is FetchResult.Source -> try {
                 coroutineContext.ensureActive()
