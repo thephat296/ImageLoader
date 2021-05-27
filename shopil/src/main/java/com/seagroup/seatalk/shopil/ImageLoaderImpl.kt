@@ -11,15 +11,16 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import okhttp3.Call
 import okhttp3.HttpUrl.Companion.toHttpUrl
-import okhttp3.OkHttpClient
 import okhttp3.internal.closeQuietly
 import timber.log.Timber
 import kotlin.coroutines.coroutineContext
 
 class ImageLoaderImpl(
     private val appContext: Context,
-    private val memoryCache: MemoryCache
+    private val memoryCache: MemoryCache,
+    private val callFactory: Call.Factory
 ) : ImageLoader {
 
     private val scope = CoroutineScope(
@@ -29,9 +30,6 @@ class ImageLoaderImpl(
 
     override fun enqueue(request: ImageRequest) {
         scope.launch {
-            val callFactory = OkHttpClient.Builder()
-                .cache(StorageUtils.createDefaultCache(appContext))
-                .build()
             val fetcher = HttpUrlFetcher(callFactory)
             val memoryCacheKey = MemoryCache.Key(fetcher.key(request.imgUrl.toHttpUrl()))
             val value = memoryCache[memoryCacheKey]

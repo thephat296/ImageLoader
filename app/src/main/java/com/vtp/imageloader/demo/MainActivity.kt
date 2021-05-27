@@ -8,10 +8,7 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        val imageLoader: ImageLoader = ImageLoaderImpl(
-            applicationContext,
-            DefaultMemoryCache(MemoryUtils.calculateAvailableMemorySize(applicationContext, 0.25))
-        )
+        val imageLoader: ImageLoader = ImageLoader.Builder(this).build()
         findViewById<Button>(R.id.btn_load_image).setOnClickListener {
             loadImage(imageLoader)
         }
