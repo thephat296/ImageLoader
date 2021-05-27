@@ -57,7 +57,7 @@ class ImageLoaderImpl(
         return when (val fetchResult = fetcher.fetch(request.imgUrl.toHttpUrl())) {
             is FetchResult.Source -> try {
                 coroutineContext.ensureActive()
-                BitmapDecoder(appContext).decode(fetchResult.source)
+                StreamBitmapDecoder(appContext).decode(fetchResult.source)
             } catch (throwable: Throwable) {
                 fetchResult.source.closeQuietly()
                 throw throwable

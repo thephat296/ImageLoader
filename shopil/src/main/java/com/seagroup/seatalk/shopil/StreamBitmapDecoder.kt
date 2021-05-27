@@ -6,7 +6,7 @@ import android.graphics.drawable.Drawable
 import androidx.core.graphics.drawable.toDrawable
 import okio.BufferedSource
 
-internal class BitmapDecoder(private val context: Context) : Decoder {
+internal class StreamBitmapDecoder(private val context: Context) : Decoder {
 
     override suspend fun decode(source: BufferedSource): Drawable =
         source.use {
