@@ -45,27 +45,32 @@ class ImageLoaderImpl(
             }
 
             // Fetch, decode, transform, and cache the image on a background dispatcher.
-            val drawable = withContext(Dispatchers.IO) {
+            val result = withContext(Dispatchers.IO) {
                 execute(request, fetcher)
-                    .also {
-                        val bitmap = (it as? BitmapDrawable)?.bitmap ?: return@also
+                    .doOnSuccess {
+                        val bitmap = (it as? BitmapDrawable)?.bitmap ?: return@doOnSuccess
                         memoryCache[memoryCacheKey] = bitmap
                     }
+            }
+            val drawable: Drawable? = when (result) {
+                is ImageResult.Success -> result.drawable
+                is ImageResult.Error -> request.error?.getDrawable(appContext)
             }
             request.imageView.setImageDrawable(drawable)
         }
     }
 
-    private suspend fun execute(request: ImageRequest, fetcher: HttpUrlFetcher): Drawable {
+    private suspend fun execute(request: ImageRequest, fetcher: HttpUrlFetcher): ImageResult {
         return when (val fetchResult = fetcher.fetch(request.imgUrl.toHttpUrl())) {
             is FetchResult.Source -> try {
                 coroutineContext.ensureActive()
-                StreamBitmapDecoder(appContext).decode(fetchResult.source)
+                val drawable = StreamBitmapDecoder(appContext).decode(fetchResult.source)
+                ImageResult.Success(drawable)
             } catch (throwable: Throwable) {
                 fetchResult.source.closeQuietly()
-                throw throwable
+                ImageResult.Error(throwable)
             }
-            is FetchResult.Drawable -> fetchResult.drawable
+            is FetchResult.Drawable -> ImageResult.Success(fetchResult.drawable)
         }
     }
 }
