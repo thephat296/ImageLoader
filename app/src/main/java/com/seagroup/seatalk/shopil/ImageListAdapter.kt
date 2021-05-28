@@ -16,7 +16,9 @@ class ImageListAdapter : ListAdapter<Url, ImageListAdapter.ViewHolder>(Callback)
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        holder.binding.root.load(url = getItem(position))
+        holder.binding.root.load(url = getItem(position)) {
+            placeholder(placeholder = ImageResource.DrawableRes(R.drawable.ic_launcher_background))
+        }
     }
 
     class ViewHolder(val binding: ItemImageBinding) : RecyclerView.ViewHolder(binding.root)

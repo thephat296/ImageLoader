@@ -30,6 +30,9 @@ class ImageLoaderImpl(
 
     override fun enqueue(request: ImageRequest) {
         scope.launch {
+            request.placeholder?.let {
+                request.imageView.setImageDrawable(it.getDrawable(appContext))
+            }
             val fetcher = HttpUrlFetcher(callFactory)
             val memoryCacheKey = MemoryCache.Key(fetcher.key(request.imgUrl.toHttpUrl()))
             val value = memoryCache[memoryCacheKey]
