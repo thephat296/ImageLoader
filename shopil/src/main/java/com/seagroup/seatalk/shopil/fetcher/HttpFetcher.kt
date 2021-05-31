@@ -1,16 +1,15 @@
 package com.seagroup.seatalk.shopil.fetcher
 
 import android.accounts.NetworkErrorException
-import com.seagroup.seatalk.shopil.request.ImageSource
 import okhttp3.Call
+import okhttp3.HttpUrl
 import okhttp3.Request
 import timber.log.Timber
 
-class UrlFetcher(private val callFactory: Call.Factory) : Fetcher {
+class HttpFetcher(private val callFactory: Call.Factory) {
     @Suppress("BlockingMethodInNonBlockingContext")
-    override suspend fun fetch(source: ImageSource): FetchResult {
-        require(source is ImageSource.Url)
-        val request = Request.Builder().url(source.data)
+    fun fetch(url: HttpUrl): FetchResult {
+        val request = Request.Builder().url(url)
         val response = callFactory.newCall(request.build()).execute()
         val body = response.body
         if (!response.isSuccessful || body == null) {

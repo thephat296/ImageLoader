@@ -13,6 +13,7 @@ import com.seagroup.seatalk.shopil.key.CacheKeyFactory
 import com.seagroup.seatalk.shopil.memory.MemoryCache
 import com.seagroup.seatalk.shopil.request.ImageRequest
 import com.seagroup.seatalk.shopil.request.ImageResult
+import com.seagroup.seatalk.shopil.request.ImageSource
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -52,7 +53,11 @@ class ImageLoaderImpl(
             }
 
             // Fetch, decode, transform, and cache the image on a background dispatcher.
-            val fetcher = dataFetcherFactory.get(request.source)
+            val fetcher: Fetcher<ImageSource> = dataFetcherFactory.get(request.source) ?: run {
+                Timber.d("Unsupported source[${request.source}]!")
+                return@launch request.imageView.setImageDrawable(null)
+            }
+
             val result = withContext(Dispatchers.IO) {
                 execute(request, fetcher)
                     .doOnSuccess {
@@ -70,7 +75,7 @@ class ImageLoaderImpl(
         }
     }
 
-    private suspend fun execute(request: ImageRequest, fetcher: Fetcher): ImageResult {
+    private suspend fun execute(request: ImageRequest, fetcher: Fetcher<ImageSource>): ImageResult {
         return when (val fetchResult = fetcher.fetch(request.source)) {
             is FetchResult.Source -> try {
                 coroutineContext.ensureActive()
@@ -81,6 +86,7 @@ class ImageLoaderImpl(
                 ImageResult.Error(throwable)
             }
             is FetchResult.Drawable -> ImageResult.Success(fetchResult.drawable)
+            is FetchResult.Error -> ImageResult.Error(fetchResult.exception)
         }
     }
 }
