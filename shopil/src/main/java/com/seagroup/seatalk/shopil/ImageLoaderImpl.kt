@@ -12,7 +12,6 @@ import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import okhttp3.Call
-import okhttp3.HttpUrl.Companion.toHttpUrl
 import okhttp3.internal.closeQuietly
 import timber.log.Timber
 import kotlin.coroutines.coroutineContext
@@ -20,7 +19,9 @@ import kotlin.coroutines.coroutineContext
 class ImageLoaderImpl(
     private val appContext: Context,
     private val memoryCache: MemoryCache,
-    private val callFactory: Call.Factory
+    private val callFactory: Call.Factory,
+    private val cacheKeyFactory: CacheKeyFactory,
+    private val dataFetcherFactory: DataFetcherFactory
 ) : ImageLoader {
 
     private val scope = CoroutineScope(
@@ -33,23 +34,25 @@ class ImageLoaderImpl(
             request.placeholder?.let {
                 request.imageView.setImageDrawable(it.getDrawable(appContext))
             }
-            val fetcher = HttpUrlFetcher(callFactory)
-            val memoryCacheKey = MemoryCache.Key(fetcher.key(request.imgUrl.toHttpUrl()))
-            val value = memoryCache[memoryCacheKey]
-            if (value != null) {
+            val cacheKey: CacheKey? = cacheKeyFactory.buildKey(request.source)
+            val cachedValue = cacheKey?.let(memoryCache::get)
+            if (cachedValue != null) {
                 Timber.d("get value from memory cache")
                 request.imageView.setImageDrawable(
-                    value.toDrawable(appContext.resources)
+                    cachedValue.toDrawable(appContext.resources)
                 )
                 return@launch
             }
 
             // Fetch, decode, transform, and cache the image on a background dispatcher.
+            val fetcher = dataFetcherFactory.get(request.source)
             val result = withContext(Dispatchers.IO) {
                 execute(request, fetcher)
                     .doOnSuccess {
                         val bitmap = (it as? BitmapDrawable)?.bitmap ?: return@doOnSuccess
-                        memoryCache[memoryCacheKey] = bitmap
+                        if (cacheKey != null) {
+                            memoryCache[cacheKey] = bitmap
+                        }
                     }
             }
             val drawable: Drawable? = when (result) {
@@ -60,8 +63,8 @@ class ImageLoaderImpl(
         }
     }
 
-    private suspend fun execute(request: ImageRequest, fetcher: HttpUrlFetcher): ImageResult {
-        return when (val fetchResult = fetcher.fetch(request.imgUrl.toHttpUrl())) {
+    private suspend fun execute(request: ImageRequest, fetcher: Fetcher): ImageResult {
+        return when (val fetchResult = fetcher.fetch(request.source)) {
             is FetchResult.Source -> try {
                 coroutineContext.ensureActive()
                 val drawable = StreamBitmapDecoder(appContext).decode(fetchResult.source)

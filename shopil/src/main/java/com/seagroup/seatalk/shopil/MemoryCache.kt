@@ -1,18 +1,13 @@
 package com.seagroup.seatalk.shopil
 
 import android.graphics.Bitmap
-import android.os.Parcelable
-import kotlinx.parcelize.Parcelize
 
 interface MemoryCache {
-    operator fun get(key: Key): Bitmap?
+    operator fun get(key: CacheKey): Bitmap?
 
-    operator fun set(key: Key, bitmap: Bitmap)
+    operator fun set(key: CacheKey, bitmap: Bitmap)
 
-    fun remove(key: Key): Boolean
+    fun remove(key: CacheKey): Boolean
 
     fun clear()
-
-    @Parcelize
-    data class Key(val base: String) : Parcelable
 }

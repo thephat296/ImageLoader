@@ -12,6 +12,8 @@ interface ImageLoader {
         private var memoryCache: MemoryCache =
             DefaultMemoryCache(MemoryUtils.calculateAvailableMemorySize(context.applicationContext))
         private var callFactory: Call.Factory
+        private var cacheKeyFactory: CacheKeyFactory
+        private var dataFetcherFactory: DataFetcherFactory
 
         init {
             callFactory = lazyCallFactory {
@@ -19,6 +21,8 @@ interface ImageLoader {
                     .cache(StorageUtils.createDefaultCache(appContext))
                     .build()
             }
+            cacheKeyFactory = CacheKeyFactory()
+            dataFetcherFactory = DataFetcherFactory(callFactory)
         }
 
         private fun lazyCallFactory(initializer: () -> Call.Factory): Call.Factory {
@@ -26,6 +30,12 @@ interface ImageLoader {
             return Call.Factory(lazy.value::newCall)
         }
 
-        fun build(): ImageLoader = ImageLoaderImpl(appContext, memoryCache, callFactory)
+        fun build(): ImageLoader = ImageLoaderImpl(
+            appContext,
+            memoryCache,
+            callFactory,
+            cacheKeyFactory,
+            dataFetcherFactory
+        )
     }
 }
