@@ -1,4 +1,4 @@
-package com.seagroup.seatalk.shopil
+package com.seagroup.seatalk.shopil.request
 
 import android.content.Context
 import androidx.appcompat.content.res.AppCompatResources

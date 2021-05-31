@@ -1,4 +1,4 @@
-package com.seagroup.seatalk.shopil
+package com.seagroup.seatalk.shopil.request
 
 sealed class ImageSource {
     class Url(val data: String) : ImageSource()

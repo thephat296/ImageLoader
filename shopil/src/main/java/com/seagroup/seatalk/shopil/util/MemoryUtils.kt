@@ -1,4 +1,4 @@
-package com.seagroup.seatalk.shopil
+package com.seagroup.seatalk.shopil.util
 
 import android.app.ActivityManager
 import android.content.Context

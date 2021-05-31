@@ -1,6 +1,7 @@
-package com.seagroup.seatalk.shopil
+package com.seagroup.seatalk.shopil.fetcher
 
 import android.accounts.NetworkErrorException
+import com.seagroup.seatalk.shopil.request.ImageSource
 import okhttp3.Call
 import okhttp3.Request
 import timber.log.Timber

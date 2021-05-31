@@ -1,4 +1,6 @@
-package com.seagroup.seatalk.shopil
+package com.seagroup.seatalk.shopil.key
+
+import com.seagroup.seatalk.shopil.request.ImageSource
 
 class CacheKeyFactory {
     fun buildKey(imageSource: ImageSource): CacheKey? = when (imageSource) {

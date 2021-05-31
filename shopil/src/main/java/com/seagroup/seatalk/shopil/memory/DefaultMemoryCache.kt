@@ -1,7 +1,8 @@
-package com.seagroup.seatalk.shopil
+package com.seagroup.seatalk.shopil.memory
 
 import android.graphics.Bitmap
 import androidx.collection.LruCache
+import com.seagroup.seatalk.shopil.key.CacheKey
 
 class DefaultMemoryCache(maxSize: Int) : MemoryCache {
     private val cache = LruCache<CacheKey, Bitmap>(maxSize)

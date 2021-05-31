@@ -1,4 +1,4 @@
-package com.seagroup.seatalk.shopil
+package com.seagroup.seatalk.shopil.decoder
 
 import android.graphics.drawable.Drawable
 import okio.BufferedSource

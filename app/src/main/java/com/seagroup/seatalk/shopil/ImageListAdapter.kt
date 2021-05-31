@@ -6,6 +6,8 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.seagroup.seatalk.shopil.databinding.ItemImageBinding
+import com.seagroup.seatalk.shopil.request.ImageResource
+import com.seagroup.seatalk.shopil.request.ImageSource
 
 typealias Url = String
 

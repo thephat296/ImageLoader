@@ -1,6 +1,7 @@
-package com.seagroup.seatalk.shopil
+package com.seagroup.seatalk.shopil.memory
 
 import android.graphics.Bitmap
+import com.seagroup.seatalk.shopil.key.CacheKey
 
 interface MemoryCache {
     operator fun get(key: CacheKey): Bitmap?
