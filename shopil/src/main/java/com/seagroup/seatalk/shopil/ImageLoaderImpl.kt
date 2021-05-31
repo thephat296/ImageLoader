@@ -21,7 +21,6 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import okhttp3.internal.closeQuietly
 import timber.log.Timber
 import kotlin.coroutines.coroutineContext
 
@@ -38,55 +37,54 @@ class ImageLoaderImpl(
     )
 
     override fun enqueue(request: ImageRequest) {
+        fun setImage(drawable: Drawable?) = request.imageView.setImageDrawable(drawable)
         scope.launch {
             request.placeholder?.let {
-                request.imageView.setImageDrawable(it.getDrawable(appContext))
+                setImage(it.getDrawable(appContext))
             }
             val cacheKey: CacheKey? = cacheKeyFactory.buildKey(request.source)
             val cachedValue = cacheKey?.let(memoryCache::get)
             if (cachedValue != null) {
                 Timber.d("get value from memory cache")
-                request.imageView.setImageDrawable(
-                    cachedValue.toDrawable(appContext.resources)
-                )
-                return@launch
+                return@launch setImage(cachedValue.toDrawable(appContext.resources))
+            }
+
+            val fetcher: Fetcher<ImageSource> = dataFetcherFactory.get(request.source) ?: run {
+                Timber.d("Unsupported ImageSource[${request.source}]!")
+                return@launch setImage(null)
             }
 
             // Fetch, decode, transform, and cache the image on a background dispatcher.
-            val fetcher: Fetcher<ImageSource> = dataFetcherFactory.get(request.source) ?: run {
-                Timber.d("Unsupported source[${request.source}]!")
-                return@launch request.imageView.setImageDrawable(null)
-            }
-
             val result = withContext(Dispatchers.IO) {
                 execute(request, fetcher)
-                    .doOnSuccess {
-                        val bitmap = (it as? BitmapDrawable)?.bitmap ?: return@doOnSuccess
-                        if (cacheKey != null) {
-                            memoryCache[cacheKey] = bitmap
-                        }
-                    }
             }
-            val drawable: Drawable? = when (result) {
-                is ImageResult.Success -> result.drawable
-                is ImageResult.Error -> request.error?.getDrawable(appContext)
+            val drawable = when (result) {
+                is ImageResult.Success -> {
+                    cacheToMemory(cacheKey, result.drawable)
+                    result.drawable
+                }
+                is ImageResult.Error -> {
+                    Timber.e(result.throwable)
+                    request.error?.getDrawable(appContext)
+                }
             }
-            request.imageView.setImageDrawable(drawable)
+            setImage(drawable)
         }
     }
 
     private suspend fun execute(request: ImageRequest, fetcher: Fetcher<ImageSource>): ImageResult {
         return when (val fetchResult = fetcher.fetch(request.source)) {
-            is FetchResult.Source -> try {
+            is FetchResult.Source -> {
                 coroutineContext.ensureActive()
-                val drawable = StreamBitmapDecoder(appContext).decode(fetchResult.source)
-                ImageResult.Success(drawable)
-            } catch (throwable: Throwable) {
-                fetchResult.source.closeQuietly()
-                ImageResult.Error(throwable)
+                StreamBitmapDecoder(appContext).decode(source = fetchResult.source).mapToImageResult()
             }
             is FetchResult.Drawable -> ImageResult.Success(fetchResult.drawable)
             is FetchResult.Error -> ImageResult.Error(fetchResult.exception)
         }
+    }
+
+    private fun cacheToMemory(cacheKey: CacheKey?, drawable: Drawable) {
+        if (cacheKey == null || drawable !is BitmapDrawable) return
+        memoryCache[cacheKey] = drawable.bitmap
     }
 }
