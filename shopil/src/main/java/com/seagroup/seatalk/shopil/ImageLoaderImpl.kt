@@ -20,7 +20,6 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import okhttp3.Call
 import okhttp3.internal.closeQuietly
 import timber.log.Timber
 import kotlin.coroutines.coroutineContext
@@ -28,7 +27,6 @@ import kotlin.coroutines.coroutineContext
 class ImageLoaderImpl(
     private val appContext: Context,
     private val memoryCache: MemoryCache,
-    private val callFactory: Call.Factory,
     private val cacheKeyFactory: CacheKeyFactory,
     private val dataFetcherFactory: DataFetcherFactory
 ) : ImageLoader {

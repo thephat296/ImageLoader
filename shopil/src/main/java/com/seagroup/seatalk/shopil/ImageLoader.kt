@@ -18,12 +18,11 @@ interface ImageLoader {
         private val appContext: Context = context.applicationContext
         private var memoryCache: MemoryCache =
             DefaultMemoryCache(MemoryUtils.calculateAvailableMemorySize(context.applicationContext))
-        private var callFactory: Call.Factory
         private var cacheKeyFactory: CacheKeyFactory
         private var dataFetcherFactory: DataFetcherFactory
 
         init {
-            callFactory = lazyCallFactory {
+            val callFactory = lazyCallFactory {
                 OkHttpClient.Builder()
                     .cache(StorageUtils.createDefaultCache(appContext))
                     .build()
@@ -40,7 +39,6 @@ interface ImageLoader {
         fun build(): ImageLoader = ImageLoaderImpl(
             appContext,
             memoryCache,
-            callFactory,
             cacheKeyFactory,
             dataFetcherFactory
         )
