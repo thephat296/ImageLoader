@@ -3,7 +3,9 @@ package com.seagroup.seatalk.shopil
 import android.content.Context
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
+import android.util.Size
 import androidx.core.graphics.drawable.toDrawable
+import com.seagroup.seatalk.shopil.decoder.DecodeParams
 import com.seagroup.seatalk.shopil.decoder.StreamBitmapDecoder
 import com.seagroup.seatalk.shopil.fetcher.DataFetcherFactory
 import com.seagroup.seatalk.shopil.fetcher.FetchResult
@@ -14,6 +16,7 @@ import com.seagroup.seatalk.shopil.memory.MemoryCache
 import com.seagroup.seatalk.shopil.request.ImageRequest
 import com.seagroup.seatalk.shopil.request.ImageResult
 import com.seagroup.seatalk.shopil.request.ImageSource
+import com.seagroup.seatalk.shopil.util.requireSize
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -42,7 +45,8 @@ class ImageLoaderImpl(
             request.placeholder?.let {
                 setImage(it.getDrawable(appContext))
             }
-            val cacheKey: CacheKey? = cacheKeyFactory.buildKey(request.source)
+            val targetSize = request.imageView.requireSize()
+            val cacheKey: CacheKey? = cacheKeyFactory.buildKey(request.source, targetSize)
             val cachedValue = cacheKey?.let(memoryCache::get)
             if (cachedValue != null) {
                 Timber.d("get value from memory cache")
@@ -56,7 +60,7 @@ class ImageLoaderImpl(
 
             // Fetch, decode, transform, and cache the image on a background dispatcher.
             val result = withContext(Dispatchers.IO) {
-                execute(request, fetcher)
+                execute(request, fetcher, targetSize)
             }
             val drawable = when (result) {
                 is ImageResult.Success -> {
@@ -72,11 +76,13 @@ class ImageLoaderImpl(
         }
     }
 
-    private suspend fun execute(request: ImageRequest, fetcher: Fetcher<ImageSource>): ImageResult {
+    private suspend fun execute(request: ImageRequest, fetcher: Fetcher<ImageSource>, targetSize: Size): ImageResult {
         return when (val fetchResult = fetcher.fetch(request.source)) {
             is FetchResult.Source -> {
                 coroutineContext.ensureActive()
-                StreamBitmapDecoder(appContext).decode(source = fetchResult.source).mapToImageResult()
+                StreamBitmapDecoder(appContext)
+                    .decode(DecodeParams(fetchResult.source, targetSize))
+                    .mapToImageResult()
             }
             is FetchResult.Drawable -> ImageResult.Success(fetchResult.drawable)
             is FetchResult.Error -> ImageResult.Error(fetchResult.exception)
