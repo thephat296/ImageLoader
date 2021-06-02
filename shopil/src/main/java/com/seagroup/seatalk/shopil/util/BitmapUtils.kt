@@ -9,4 +9,10 @@ object BitmapUtils {
         val heightInSampleSize = Integer.highestOneBit(srcSize.height / dstSize.height).coerceAtLeast(1)
         return max(widthInSampleSize, heightInSampleSize)
     }
+
+    fun calculateSizeScale(srcSize: Size, dstSize: Size): Double {
+        val widthPercent = dstSize.width.toDouble() / srcSize.width
+        val heightPercent = dstSize.height.toDouble() / srcSize.height
+        return max(widthPercent, heightPercent)
+    }
 }
