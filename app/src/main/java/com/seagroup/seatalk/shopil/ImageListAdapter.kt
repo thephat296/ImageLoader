@@ -27,7 +27,7 @@ class ImageListAdapter : ListAdapter<Url, ImageListAdapter.ViewHolder>(Callback)
     class ViewHolder(val binding: ItemImageBinding) : RecyclerView.ViewHolder(binding.root)
 
     private object Callback : DiffUtil.ItemCallback<Url>() {
-        override fun areItemsTheSame(old: Url, new: Url) = old === new
+        override fun areItemsTheSame(old: Url, new: Url) = old == new
         override fun areContentsTheSame(old: Url, new: Url) = old == new
     }
 
