@@ -6,7 +6,7 @@ import okio.buffer
 import okio.source
 import java.io.InputStream
 
-class ContentUriFetcher(private val context: Context) : BaseFetcher<ImageSource.Uri>() {
+internal class ContentUriFetcher(private val context: Context) : BaseFetcher<ImageSource.Uri>() {
     @Suppress("BlockingMethodInNonBlockingContext")
     override suspend fun execute(source: ImageSource.Uri): FetchData {
         val inputStream: InputStream = context.contentResolver.openInputStream(source.data)

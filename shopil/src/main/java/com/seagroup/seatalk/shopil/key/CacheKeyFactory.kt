@@ -4,7 +4,7 @@ import com.seagroup.seatalk.shopil.request.ImageRequest
 import com.seagroup.seatalk.shopil.request.ImageSource
 import com.seagroup.seatalk.shopil.util.requireSize
 
-class CacheKeyFactory {
+internal class CacheKeyFactory {
     fun buildKey(request: ImageRequest): CacheKey? {
         val source = request.source
         val size = request.imageView.requireSize()

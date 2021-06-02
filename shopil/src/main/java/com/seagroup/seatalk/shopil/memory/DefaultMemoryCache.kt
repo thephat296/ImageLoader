@@ -4,7 +4,7 @@ import android.graphics.Bitmap
 import androidx.collection.LruCache
 import com.seagroup.seatalk.shopil.key.CacheKey
 
-class DefaultMemoryCache(maxSize: Int) : MemoryCache {
+internal class DefaultMemoryCache(maxSize: Int) : MemoryCache {
     private val cache = object : LruCache<CacheKey, Bitmap>(maxSize) {
         override fun sizeOf(key: CacheKey, value: Bitmap) = value.allocationByteCount
     }

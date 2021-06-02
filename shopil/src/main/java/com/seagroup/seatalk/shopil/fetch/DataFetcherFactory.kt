@@ -6,7 +6,7 @@ import android.net.Uri
 import com.seagroup.seatalk.shopil.request.ImageSource
 
 @Suppress("UNCHECKED_CAST")
-class DataFetcherFactory(
+internal class DataFetcherFactory(
     private val drawableFetcher: DrawableFetcher,
     private val contentUriFetcher: ContentUriFetcher,
     private val fileFetcher: FileFetcher,

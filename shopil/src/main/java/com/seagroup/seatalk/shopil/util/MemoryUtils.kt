@@ -5,7 +5,7 @@ import android.content.Context
 import android.content.pm.ApplicationInfo
 import androidx.core.content.getSystemService
 
-object MemoryUtils {
+internal object MemoryUtils {
     private const val DEFAULT_MEMORY_CLASS_MEGABYTES = 256
     private const val DEFAULT_AVAILABLE_MEMORY_PERCENTAGE = 0.25
 

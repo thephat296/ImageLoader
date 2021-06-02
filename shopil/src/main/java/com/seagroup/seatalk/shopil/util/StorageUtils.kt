@@ -5,7 +5,7 @@ import android.os.StatFs
 import okhttp3.Cache
 import java.io.File
 
-object StorageUtils {
+internal object StorageUtils {
     private const val CACHE_DIRECTORY_NAME = "image_cache"
     private const val MIN_DISK_CACHE_SIZE_BYTES = 10L * 1024 * 1024 // 10MB
     private const val MAX_DISK_CACHE_SIZE_BYTES = 250L * 1024 * 1024 // 250MB

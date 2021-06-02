@@ -4,7 +4,7 @@ import android.graphics.BitmapFactory
 import android.util.Size
 import kotlin.math.roundToInt
 
-fun BitmapFactory.Options.resize(srcSize: Size, dstSize: Size) {
+internal fun BitmapFactory.Options.resize(srcSize: Size, dstSize: Size) {
     inSampleSize = BitmapUtils.calculateInSampleSize(srcSize, dstSize)
     val scale = BitmapUtils
         .calculateSizeScale(srcSize = srcSize.scaleDownTo(inSampleSize), dstSize = dstSize)

@@ -6,7 +6,7 @@ import okhttp3.HttpUrl
 import okhttp3.Request
 import timber.log.Timber
 
-class HttpFetcher(private val callFactory: Call.Factory) {
+internal class HttpFetcher(private val callFactory: Call.Factory) {
     @Suppress("BlockingMethodInNonBlockingContext")
     fun fetch(url: HttpUrl): FetchData {
         val request = Request.Builder().url(url)

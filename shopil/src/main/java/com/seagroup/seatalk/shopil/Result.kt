@@ -1,6 +1,6 @@
 package com.seagroup.seatalk.shopil
 
-sealed class Result<out R> {
+internal sealed class Result<out R> {
     data class Success<T>(val data: T) : Result<T>()
     data class Error(val throwable: Throwable) : Result<Nothing>()
 

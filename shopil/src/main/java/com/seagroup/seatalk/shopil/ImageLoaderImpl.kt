@@ -26,7 +26,7 @@ import kotlinx.coroutines.withContext
 import timber.log.Timber
 import kotlin.coroutines.coroutineContext
 
-class ImageLoaderImpl(
+internal class ImageLoaderImpl(
     private val appContext: Context,
     private val memoryCache: MemoryCache,
     private val cacheKeyFactory: CacheKeyFactory,
