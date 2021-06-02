@@ -6,14 +6,11 @@ import okio.buffer
 import okio.source
 import java.io.InputStream
 
-class ContentUriFetcher(private val context: Context) : Fetcher<ImageSource.Uri> {
+class ContentUriFetcher(private val context: Context) : BaseFetcher<ImageSource.Uri>() {
     @Suppress("BlockingMethodInNonBlockingContext")
-    override suspend fun fetch(source: ImageSource.Uri): FetchResult {
-        val inputStream: InputStream? = context.contentResolver.openInputStream(source.data)
-        return if (inputStream == null) {
-            FetchResult.Error(IllegalStateException("Unable to open ${source.data}"))
-        } else {
-            FetchResult.Source(inputStream.source().buffer())
-        }
+    override suspend fun execute(source: ImageSource.Uri): FetchData {
+        val inputStream: InputStream = context.contentResolver.openInputStream(source.data)
+            ?: throw IllegalStateException("Unable to open ${source.data}")
+        return FetchData.Source(inputStream.source().buffer())
     }
 }

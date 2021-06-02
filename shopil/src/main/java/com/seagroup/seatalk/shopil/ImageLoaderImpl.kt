@@ -8,13 +8,12 @@ import androidx.core.graphics.drawable.toDrawable
 import com.seagroup.seatalk.shopil.decode.DecodeParams
 import com.seagroup.seatalk.shopil.decode.StreamBitmapDecoder
 import com.seagroup.seatalk.shopil.fetch.DataFetcherFactory
-import com.seagroup.seatalk.shopil.fetch.FetchResult
+import com.seagroup.seatalk.shopil.fetch.FetchData
 import com.seagroup.seatalk.shopil.fetch.Fetcher
 import com.seagroup.seatalk.shopil.key.CacheKey
 import com.seagroup.seatalk.shopil.key.CacheKeyFactory
 import com.seagroup.seatalk.shopil.memory.MemoryCache
 import com.seagroup.seatalk.shopil.request.ImageRequest
-import com.seagroup.seatalk.shopil.request.ImageResult
 import com.seagroup.seatalk.shopil.request.ImageSource
 import com.seagroup.seatalk.shopil.util.requireSize
 import kotlinx.coroutines.CoroutineExceptionHandler
@@ -63,11 +62,11 @@ class ImageLoaderImpl(
                 execute(request, fetcher, targetSize)
             }
             val drawable = when (result) {
-                is ImageResult.Success -> {
-                    cacheToMemory(cacheKey, result.drawable)
-                    result.drawable
+                is Result.Success -> {
+                    cacheToMemory(cacheKey, result.data)
+                    result.data
                 }
-                is ImageResult.Error -> {
+                is Result.Error -> {
                     Timber.e(result.throwable)
                     request.error?.getDrawable(appContext)
                 }
@@ -76,17 +75,20 @@ class ImageLoaderImpl(
         }
     }
 
-    private suspend fun execute(request: ImageRequest, fetcher: Fetcher<ImageSource>, targetSize: Size): ImageResult {
-        return when (val fetchResult = fetcher.fetch(request.source)) {
-            is FetchResult.Source -> {
+    private suspend fun execute(
+        request: ImageRequest,
+        fetcher: Fetcher<ImageSource>,
+        targetSize: Size
+    ): Result<Drawable> =
+        fetcher.fetch(request.source)
+            .flatMap {
                 coroutineContext.ensureActive()
-                StreamBitmapDecoder(appContext)
-                    .decode(DecodeParams(fetchResult.source, targetSize))
-                    .mapToImageResult()
+                processFetchData(it, targetSize)
             }
-            is FetchResult.Drawable -> ImageResult.Success(fetchResult.drawable)
-            is FetchResult.Error -> ImageResult.Error(fetchResult.exception)
-        }
+
+    private suspend fun processFetchData(data: FetchData, targetSize: Size): Result<Drawable> = when (data) {
+        is FetchData.Drawable -> Result.Success(data.drawable)
+        is FetchData.Source -> StreamBitmapDecoder(appContext).decode(DecodeParams(data.source, targetSize))
     }
 
     private fun cacheToMemory(cacheKey: CacheKey?, drawable: Drawable) {

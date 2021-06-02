@@ -8,7 +8,7 @@ import timber.log.Timber
 
 class HttpFetcher(private val callFactory: Call.Factory) {
     @Suppress("BlockingMethodInNonBlockingContext")
-    fun fetch(url: HttpUrl): FetchResult {
+    fun fetch(url: HttpUrl): FetchData {
         val request = Request.Builder().url(url)
         val response = callFactory.newCall(request.build()).execute()
         val body = response.body
@@ -18,6 +18,6 @@ class HttpFetcher(private val callFactory: Call.Factory) {
         }
         val useDiskCache = response.cacheResponse != null
         Timber.d("is using disk cache: $useDiskCache")
-        return FetchResult.Source(body.source())
+        return FetchData.Source(body.source())
     }
 }

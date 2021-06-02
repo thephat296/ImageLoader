@@ -5,8 +5,8 @@ import com.seagroup.seatalk.shopil.request.ImageSource
 import okio.buffer
 import okio.source
 
-class FileUriFetcher : Fetcher<ImageSource.Uri> {
+class FileUriFetcher : BaseFetcher<ImageSource.Uri>() {
     @Suppress("BlockingMethodInNonBlockingContext")
-    override suspend fun fetch(source: ImageSource.Uri): FetchResult =
-        FetchResult.Source(source = source.data.toFile().source().buffer())
+    override suspend fun execute(source: ImageSource.Uri): FetchData =
+        FetchData.Source(source = source.data.toFile().source().buffer())
 }
