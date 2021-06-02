@@ -1,4 +1,4 @@
-package com.seagroup.seatalk.shopil.fetcher
+package com.seagroup.seatalk.shopil.fetch
 
 import com.seagroup.seatalk.shopil.request.ImageSource
 import okhttp3.HttpUrl.Companion.toHttpUrl

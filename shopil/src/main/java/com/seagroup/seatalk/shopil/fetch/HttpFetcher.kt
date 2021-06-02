@@ -1,4 +1,4 @@
-package com.seagroup.seatalk.shopil.fetcher
+package com.seagroup.seatalk.shopil.fetch
 
 import android.accounts.NetworkErrorException
 import okhttp3.Call

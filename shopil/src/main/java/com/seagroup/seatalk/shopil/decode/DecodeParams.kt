@@ -1,4 +1,4 @@
-package com.seagroup.seatalk.shopil.decoder
+package com.seagroup.seatalk.shopil.decode
 
 import android.util.Size
 import okio.BufferedSource

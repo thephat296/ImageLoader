@@ -1,4 +1,4 @@
-package com.seagroup.seatalk.shopil.decoder
+package com.seagroup.seatalk.shopil.decode
 
 import android.graphics.drawable.Drawable
 import com.seagroup.seatalk.shopil.request.ImageResult

@@ -5,11 +5,11 @@ import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
 import android.util.Size
 import androidx.core.graphics.drawable.toDrawable
-import com.seagroup.seatalk.shopil.decoder.DecodeParams
-import com.seagroup.seatalk.shopil.decoder.StreamBitmapDecoder
-import com.seagroup.seatalk.shopil.fetcher.DataFetcherFactory
-import com.seagroup.seatalk.shopil.fetcher.FetchResult
-import com.seagroup.seatalk.shopil.fetcher.Fetcher
+import com.seagroup.seatalk.shopil.decode.DecodeParams
+import com.seagroup.seatalk.shopil.decode.StreamBitmapDecoder
+import com.seagroup.seatalk.shopil.fetch.DataFetcherFactory
+import com.seagroup.seatalk.shopil.fetch.FetchResult
+import com.seagroup.seatalk.shopil.fetch.Fetcher
 import com.seagroup.seatalk.shopil.key.CacheKey
 import com.seagroup.seatalk.shopil.key.CacheKeyFactory
 import com.seagroup.seatalk.shopil.memory.MemoryCache

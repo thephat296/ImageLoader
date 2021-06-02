@@ -1,4 +1,4 @@
-package com.seagroup.seatalk.shopil.fetcher
+package com.seagroup.seatalk.shopil.fetch
 
 import android.content.ContentResolver.SCHEME_CONTENT
 import android.content.ContentResolver.SCHEME_FILE

@@ -1,4 +1,4 @@
-package com.seagroup.seatalk.shopil.decoder
+package com.seagroup.seatalk.shopil.decode
 
 import android.content.Context
 import android.graphics.BitmapFactory

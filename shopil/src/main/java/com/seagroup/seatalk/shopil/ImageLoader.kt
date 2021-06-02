@@ -1,14 +1,14 @@
 package com.seagroup.seatalk.shopil
 
 import android.content.Context
-import com.seagroup.seatalk.shopil.fetcher.ContentUriFetcher
-import com.seagroup.seatalk.shopil.fetcher.DataFetcherFactory
-import com.seagroup.seatalk.shopil.fetcher.DrawableFetcher
-import com.seagroup.seatalk.shopil.fetcher.FileFetcher
-import com.seagroup.seatalk.shopil.fetcher.FileUriFetcher
-import com.seagroup.seatalk.shopil.fetcher.HttpFetcher
-import com.seagroup.seatalk.shopil.fetcher.HttpUriFetcher
-import com.seagroup.seatalk.shopil.fetcher.HttpUrlFetcher
+import com.seagroup.seatalk.shopil.fetch.ContentUriFetcher
+import com.seagroup.seatalk.shopil.fetch.DataFetcherFactory
+import com.seagroup.seatalk.shopil.fetch.DrawableFetcher
+import com.seagroup.seatalk.shopil.fetch.FileFetcher
+import com.seagroup.seatalk.shopil.fetch.FileUriFetcher
+import com.seagroup.seatalk.shopil.fetch.HttpFetcher
+import com.seagroup.seatalk.shopil.fetch.HttpUriFetcher
+import com.seagroup.seatalk.shopil.fetch.HttpUrlFetcher
 import com.seagroup.seatalk.shopil.key.CacheKeyFactory
 import com.seagroup.seatalk.shopil.memory.DefaultMemoryCache
 import com.seagroup.seatalk.shopil.request.ImageRequest
