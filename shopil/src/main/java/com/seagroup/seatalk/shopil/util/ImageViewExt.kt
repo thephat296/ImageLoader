@@ -6,7 +6,7 @@ import android.widget.ImageView
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlin.coroutines.resume
 
-suspend fun ImageView.requireSize(): Size {
+suspend fun ImageView.awaitSize(): Size {
     // the view is already measured.
     getSize()?.let { return it }
 
@@ -34,6 +34,8 @@ suspend fun ImageView.requireSize(): Size {
         }
     }
 }
+
+fun ImageView.requireSize(): Size = getSize()!!
 
 private fun ImageView.getSize(): Size? =
     Size(width, height)

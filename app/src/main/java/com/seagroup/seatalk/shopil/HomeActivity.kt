@@ -17,7 +17,7 @@ class HomeActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityHomeBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        listAdapter = ImageListAdapter()
+        listAdapter = ImageListAdapter(this)
         with(binding.rvImages) {
             adapter = listAdapter
             layoutManager = StaggeredGridLayoutManager(ImageListAdapter.NUM_COLUMNS, StaggeredGridLayoutManager.VERTICAL)

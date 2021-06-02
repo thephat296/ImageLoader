@@ -5,4 +5,8 @@ import android.util.Size
 import kotlinx.parcelize.Parcelize
 
 @Parcelize
-data class CacheKey(val source: String, val size: Size) : Parcelable
+data class CacheKey(
+    val source: String,
+    val size: Size,
+    val transformations: List<String>?
+) : Parcelable
