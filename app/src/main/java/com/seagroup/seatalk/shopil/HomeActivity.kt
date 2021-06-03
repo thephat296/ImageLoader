@@ -3,8 +3,10 @@ package com.seagroup.seatalk.shopil
 import android.os.Bundle
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.seagroup.seatalk.shopil.databinding.ActivityHomeBinding
+import kotlinx.coroutines.launch
 
 class HomeActivity : AppCompatActivity() {
 
@@ -24,6 +26,14 @@ class HomeActivity : AppCompatActivity() {
         }
         binding.btnLoadImages.setOnClickListener {
             viewModel.loadImages().observe(this, listAdapter::submitList)
+        }
+        binding.btnClearMemoryCache.setOnClickListener {
+            (application as AndroidApplication).imageLoader.clearMemoryCache()
+        }
+        binding.btnClearDiskCache.setOnClickListener {
+            lifecycleScope.launch {
+                (application as AndroidApplication).imageLoader.clearDiskCache()
+            }
         }
     }
 }

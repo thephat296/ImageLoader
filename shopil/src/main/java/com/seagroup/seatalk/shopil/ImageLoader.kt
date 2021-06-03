@@ -1,6 +1,8 @@
 package com.seagroup.seatalk.shopil
 
 import android.content.Context
+import com.seagroup.seatalk.shopil.cache.CacheManagerImpl
+import com.seagroup.seatalk.shopil.cache.DefaultDiskCache
 import com.seagroup.seatalk.shopil.cache.DefaultMemoryCache
 import com.seagroup.seatalk.shopil.fetch.ContentUriFetcher
 import com.seagroup.seatalk.shopil.fetch.DataFetcherManager
@@ -16,7 +18,7 @@ import com.seagroup.seatalk.shopil.util.StorageUtils
 import okhttp3.Call
 import okhttp3.OkHttpClient
 
-interface ImageLoader {
+interface ImageLoader : CacheManager {
     fun enqueue(request: ImageRequest)
 
     class Builder(context: Context) {
@@ -24,7 +26,10 @@ interface ImageLoader {
 
         fun build(): ImageLoader = ImageLoaderImpl(
             appContext = appContext,
-            memoryCache = DefaultMemoryCache(MemoryUtils.calculateAvailableMemorySize(appContext)),
+            cacheManager = CacheManagerImpl(
+                memoryCache = DefaultMemoryCache(MemoryUtils.calculateAvailableMemorySize(appContext)),
+                diskCache = DefaultDiskCache(StorageUtils.getDefaultCacheDirectory(appContext))
+            ),
             dataFetcherManager = createDataFetcherManager()
         )
 

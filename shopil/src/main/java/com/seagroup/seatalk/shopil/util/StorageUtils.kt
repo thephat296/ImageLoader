@@ -17,7 +17,7 @@ internal object StorageUtils {
         return Cache(cacheDirectory, cacheSize)
     }
 
-    private fun getDefaultCacheDirectory(context: Context): File =
+    fun getDefaultCacheDirectory(context: Context): File =
         File(context.cacheDir, CACHE_DIRECTORY_NAME).apply { mkdirs() }
 
     private fun calculateDiskCacheSize(cacheDirectory: File): Long =

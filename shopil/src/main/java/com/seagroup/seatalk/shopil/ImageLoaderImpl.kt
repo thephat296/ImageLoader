@@ -6,7 +6,6 @@ import android.graphics.drawable.Drawable
 import android.util.Size
 import androidx.core.graphics.drawable.toDrawable
 import com.seagroup.seatalk.shopil.cache.CacheKey
-import com.seagroup.seatalk.shopil.cache.MemoryCache
 import com.seagroup.seatalk.shopil.decode.DecodeParams
 import com.seagroup.seatalk.shopil.decode.StreamBitmapDecoder
 import com.seagroup.seatalk.shopil.fetch.DataFetcherManager
@@ -27,9 +26,9 @@ import kotlin.coroutines.coroutineContext
 
 internal class ImageLoaderImpl(
     private val appContext: Context,
-    private val memoryCache: MemoryCache,
+    private val cacheManager: CacheManager,
     private val dataFetcherManager: DataFetcherManager
-) : ImageLoader {
+) : ImageLoader, CacheManager by cacheManager {
 
     private val scope = CoroutineScope(
         SupervisorJob() + Dispatchers.Main.immediate +
@@ -43,7 +42,9 @@ internal class ImageLoaderImpl(
             request.imageView.awaitSize()
 
             withContext(Dispatchers.IO) {
-                val cachedImage = request.cacheKey?.let(memoryCache::get)?.toDrawable(appContext.resources)
+                val cachedImage = request.cacheKey?.let {
+                    getCache(it)
+                }?.toDrawable(appContext.resources)
                 cachedImage ?: fetchImage(request)
             }.let(::setImage)
         }
@@ -79,8 +80,8 @@ internal class ImageLoaderImpl(
             .toDrawable(appContext.resources)
     }
 
-    private fun cacheToMemory(cacheKey: CacheKey?, drawable: Drawable) {
+    private suspend fun cacheToMemory(cacheKey: CacheKey?, drawable: Drawable) {
         if (cacheKey == null || drawable !is BitmapDrawable) return
-        memoryCache[cacheKey] = drawable.bitmap
+        putCache(cacheKey, drawable.bitmap)
     }
 }
