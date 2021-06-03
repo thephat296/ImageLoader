@@ -3,10 +3,11 @@ package com.seagroup.seatalk.shopil.fetch
 import android.content.ContentResolver.SCHEME_CONTENT
 import android.content.ContentResolver.SCHEME_FILE
 import android.net.Uri
+import com.seagroup.seatalk.shopil.Result
 import com.seagroup.seatalk.shopil.request.ImageSource
 
 @Suppress("UNCHECKED_CAST")
-internal class DataFetcherFactory(
+internal class DataFetcherManager(
     private val drawableFetcher: DrawableFetcher,
     private val contentUriFetcher: ContentUriFetcher,
     private val fileFetcher: FileFetcher,
@@ -14,10 +15,17 @@ internal class DataFetcherFactory(
     private val httpUrlFetcher: HttpUrlFetcher,
     private val fileUriFetcher: FileUriFetcher
 ) {
-    fun get(imageSource: ImageSource): Fetcher<ImageSource>? = when (imageSource) {
+
+    suspend fun fetch(imageSource: ImageSource): Result<FetchData> {
+        val fetcher = imageSource.getFetcher()
+            ?: return Result.Error(IllegalArgumentException("Unsupported ImageSource[$imageSource]"))
+        return fetcher.fetch(imageSource)
+    }
+
+    private fun ImageSource.getFetcher(): Fetcher<ImageSource>? = when (this) {
         is ImageSource.Drawable -> drawableFetcher
         is ImageSource.File -> fileFetcher
-        is ImageSource.Uri -> imageSource.data.getUriFetcher()
+        is ImageSource.Uri -> data.getUriFetcher()
         is ImageSource.Url -> httpUrlFetcher
     } as? Fetcher<ImageSource>
 

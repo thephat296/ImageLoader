@@ -1,7 +1,9 @@
 package com.seagroup.seatalk.shopil.request
 
 import android.widget.ImageView
+import com.seagroup.seatalk.shopil.cache.CacheKey
 import com.seagroup.seatalk.shopil.transform.Transformation
+import com.seagroup.seatalk.shopil.util.requireSize
 
 class ImageRequest(
     val source: ImageSource,
@@ -10,6 +12,22 @@ class ImageRequest(
     val error: ImageResource? = null,
     val transformations: List<Transformation>? = null
 ) {
+
+    val cacheKey: CacheKey? by lazy { buildKey() }
+
+    private fun buildKey(): CacheKey? {
+        val size = imageView.requireSize()
+        val transformations = transformations?.mapNotNull {
+            it.javaClass.canonicalName
+        }
+        val sourceKey = when (source) {
+            is ImageSource.Drawable -> null // no need to cache
+            is ImageSource.File -> source.data.path
+            is ImageSource.Uri -> source.data.toString()
+            is ImageSource.Url -> source.data
+        } ?: return null
+        return CacheKey(sourceKey, size, transformations)
+    }
 
     class Builder(
         private val source: ImageSource,

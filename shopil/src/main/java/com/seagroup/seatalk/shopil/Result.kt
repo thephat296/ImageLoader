@@ -13,4 +13,21 @@ internal sealed class Result<out R> {
         is Error -> Error(throwable)
         is Success -> transform(data)
     }
+
+    inline fun doOnSuccess(onSuccess: (data: R) -> Unit): Result<R> {
+        if (this is Success) {
+            onSuccess(data)
+        }
+        return this
+    }
+
+    inline fun doOnError(onError: (Throwable) -> Unit): Result<R> {
+        if (this is Error) {
+            onError(throwable)
+        }
+        return this
+    }
 }
+
+internal val <T> Result<T>.data
+    get() = (this as? Result.Success)?.data

@@ -3,17 +3,16 @@ package com.seagroup.seatalk.shopil
 import android.content.Context
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
+import android.util.Size
 import androidx.core.graphics.drawable.toDrawable
+import com.seagroup.seatalk.shopil.cache.CacheKey
+import com.seagroup.seatalk.shopil.cache.MemoryCache
 import com.seagroup.seatalk.shopil.decode.DecodeParams
 import com.seagroup.seatalk.shopil.decode.StreamBitmapDecoder
-import com.seagroup.seatalk.shopil.fetch.DataFetcherFactory
+import com.seagroup.seatalk.shopil.fetch.DataFetcherManager
 import com.seagroup.seatalk.shopil.fetch.FetchData
-import com.seagroup.seatalk.shopil.fetch.Fetcher
-import com.seagroup.seatalk.shopil.key.CacheKey
-import com.seagroup.seatalk.shopil.key.CacheKeyFactory
-import com.seagroup.seatalk.shopil.memory.MemoryCache
 import com.seagroup.seatalk.shopil.request.ImageRequest
-import com.seagroup.seatalk.shopil.request.ImageSource
+import com.seagroup.seatalk.shopil.transform.Transformation
 import com.seagroup.seatalk.shopil.util.awaitSize
 import com.seagroup.seatalk.shopil.util.requireSize
 import kotlinx.coroutines.CoroutineExceptionHandler
@@ -29,8 +28,7 @@ import kotlin.coroutines.coroutineContext
 internal class ImageLoaderImpl(
     private val appContext: Context,
     private val memoryCache: MemoryCache,
-    private val cacheKeyFactory: CacheKeyFactory,
-    private val dataFetcherFactory: DataFetcherFactory
+    private val dataFetcherManager: DataFetcherManager
 ) : ImageLoader {
 
     private val scope = CoroutineScope(
@@ -41,65 +39,39 @@ internal class ImageLoaderImpl(
     override fun enqueue(request: ImageRequest) {
         fun setImage(drawable: Drawable?) = request.imageView.setImageDrawable(drawable)
         scope.launch {
-            request.placeholder?.let {
-                setImage(it.getDrawable(appContext))
-            }
+            request.placeholder?.getDrawable(appContext)?.let(::setImage)
             request.imageView.awaitSize()
-            val cacheKey: CacheKey? = cacheKeyFactory.buildKey(request)
-            val cachedValue = cacheKey?.let(memoryCache::get)
-            if (cachedValue != null) {
-                Timber.d("get value from memory cache")
-                return@launch setImage(cachedValue.toDrawable(appContext.resources))
-            }
 
-            val fetcher: Fetcher<ImageSource> = dataFetcherFactory.get(request.source) ?: run {
-                Timber.d("Unsupported ImageSource[${request.source}]!")
-                return@launch setImage(null)
-            }
-
-            // Fetch, decode, transform, and cache the image on a background dispatcher.
-            val result = withContext(Dispatchers.IO) {
-                execute(request, fetcher)
-            }
-            val drawable = when (result) {
-                is Result.Success -> {
-                    cacheToMemory(cacheKey, result.data)
-                    result.data
-                }
-                is Result.Error -> {
-                    Timber.e(result.throwable)
-                    request.error?.getDrawable(appContext)
-                }
-            }
-            setImage(drawable)
+            withContext(Dispatchers.IO) {
+                val cachedImage = request.cacheKey?.let(memoryCache::get)?.toDrawable(appContext.resources)
+                cachedImage ?: fetchImage(request)
+            }.let(::setImage)
         }
     }
 
-    private suspend fun execute(
-        request: ImageRequest,
-        fetcher: Fetcher<ImageSource>
-    ): Result<Drawable> =
-        fetcher.fetch(request.source)
-            .flatMap {
+    private suspend fun fetchImage(request: ImageRequest): Drawable? =
+        dataFetcherManager.fetch(request.source)
+            .flatMap { drawable ->
                 coroutineContext.ensureActive()
-                processFetchData(request, it)
+                decode(drawable, request.imageView.requireSize())
             }
+            .map { drawable ->
+                coroutineContext.ensureActive()
+                applyTransformations(drawable, request.transformations)
+            }
+            .doOnSuccess {
+                cacheToMemory(request.cacheKey, it)
+            }
+            .doOnError(Timber::d)
+            .data ?: request.error?.getDrawable(appContext)
 
-    private suspend fun processFetchData(
-        request: ImageRequest,
-        data: FetchData,
-    ): Result<Drawable> = when (data) {
-        is FetchData.Drawable -> Result.Success(applyTransformations(request, data.drawable))
+    private suspend fun decode(data: FetchData, targetSize: Size): Result<Drawable> = when (data) {
+        is FetchData.Drawable -> Result.Success(data.drawable)
         is FetchData.Source -> StreamBitmapDecoder(appContext)
-            .decode(DecodeParams(data.source, request.imageView.requireSize()))
-            .map {
-                coroutineContext.ensureActive()
-                applyTransformations(request, it)
-            }
+            .decode(DecodeParams(data.source, targetSize))
     }
 
-    private suspend fun applyTransformations(request: ImageRequest, drawable: Drawable): Drawable {
-        val transformations = request.transformations
+    private suspend fun applyTransformations(drawable: Drawable, transformations: List<Transformation>?): Drawable {
         if (drawable !is BitmapDrawable || transformations.isNullOrEmpty()) return drawable
         return transformations.fold(drawable.bitmap) { bitmap, transformation ->
             transformation.transform(bitmap)

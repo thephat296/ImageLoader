@@ -4,7 +4,6 @@ import android.accounts.NetworkErrorException
 import okhttp3.Call
 import okhttp3.HttpUrl
 import okhttp3.Request
-import timber.log.Timber
 
 internal class HttpFetcher(private val callFactory: Call.Factory) {
     @Suppress("BlockingMethodInNonBlockingContext")
@@ -16,8 +15,6 @@ internal class HttpFetcher(private val callFactory: Call.Factory) {
             response.body?.close()
             throw NetworkErrorException()
         }
-        val useDiskCache = response.cacheResponse != null
-        Timber.d("is using disk cache: $useDiskCache")
         return FetchData.Source(body.source())
     }
 }

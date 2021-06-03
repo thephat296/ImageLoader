@@ -1,16 +1,15 @@
 package com.seagroup.seatalk.shopil
 
 import android.content.Context
+import com.seagroup.seatalk.shopil.cache.DefaultMemoryCache
 import com.seagroup.seatalk.shopil.fetch.ContentUriFetcher
-import com.seagroup.seatalk.shopil.fetch.DataFetcherFactory
+import com.seagroup.seatalk.shopil.fetch.DataFetcherManager
 import com.seagroup.seatalk.shopil.fetch.DrawableFetcher
 import com.seagroup.seatalk.shopil.fetch.FileFetcher
 import com.seagroup.seatalk.shopil.fetch.FileUriFetcher
 import com.seagroup.seatalk.shopil.fetch.HttpFetcher
 import com.seagroup.seatalk.shopil.fetch.HttpUriFetcher
 import com.seagroup.seatalk.shopil.fetch.HttpUrlFetcher
-import com.seagroup.seatalk.shopil.key.CacheKeyFactory
-import com.seagroup.seatalk.shopil.memory.DefaultMemoryCache
 import com.seagroup.seatalk.shopil.request.ImageRequest
 import com.seagroup.seatalk.shopil.util.MemoryUtils
 import com.seagroup.seatalk.shopil.util.StorageUtils
@@ -26,18 +25,17 @@ interface ImageLoader {
         fun build(): ImageLoader = ImageLoaderImpl(
             appContext = appContext,
             memoryCache = DefaultMemoryCache(MemoryUtils.calculateAvailableMemorySize(appContext)),
-            cacheKeyFactory = CacheKeyFactory(),
-            dataFetcherFactory = createDataFetcherFactory()
+            dataFetcherManager = createDataFetcherManager()
         )
 
-        private fun createDataFetcherFactory(): DataFetcherFactory {
+        private fun createDataFetcherManager(): DataFetcherManager {
             val callFactory = lazyCallFactory {
                 OkHttpClient.Builder()
-                    .cache(StorageUtils.createDefaultCache(appContext))
+//                    .cache(StorageUtils.createDefaultCache(appContext))
                     .build()
             }
             val httpFetcher = HttpFetcher(callFactory)
-            return DataFetcherFactory(
+            return DataFetcherManager(
                 drawableFetcher = DrawableFetcher(),
                 contentUriFetcher = ContentUriFetcher(appContext),
                 fileFetcher = FileFetcher(),
