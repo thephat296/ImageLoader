@@ -1,10 +1,9 @@
 package com.seagroup.seatalk.shopil.cache
 
 import android.graphics.Bitmap
-import com.seagroup.seatalk.shopil.CacheManager
 import timber.log.Timber
 
-class CacheManagerImpl(
+internal class CacheManagerImpl(
     private val memoryCache: MemoryCache,
     private val diskCache: DiskCache
 ) : CacheManager {

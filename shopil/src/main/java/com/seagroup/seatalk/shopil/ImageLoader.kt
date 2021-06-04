@@ -1,18 +1,22 @@
 package com.seagroup.seatalk.shopil
 
 import android.content.Context
+import com.seagroup.seatalk.shopil.cache.CacheManager
 import com.seagroup.seatalk.shopil.cache.CacheManagerImpl
 import com.seagroup.seatalk.shopil.cache.DefaultDiskCache
 import com.seagroup.seatalk.shopil.cache.DefaultMemoryCache
+import com.seagroup.seatalk.shopil.decode.StreamBitmapDecoder
 import com.seagroup.seatalk.shopil.fetch.ContentUriFetcher
-import com.seagroup.seatalk.shopil.fetch.DataFetcherManager
-import com.seagroup.seatalk.shopil.fetch.DrawableFetcher
+import com.seagroup.seatalk.shopil.fetch.Fetcher
 import com.seagroup.seatalk.shopil.fetch.FileFetcher
 import com.seagroup.seatalk.shopil.fetch.FileUriFetcher
 import com.seagroup.seatalk.shopil.fetch.HttpFetcher
 import com.seagroup.seatalk.shopil.fetch.HttpUriFetcher
 import com.seagroup.seatalk.shopil.fetch.HttpUrlFetcher
+import com.seagroup.seatalk.shopil.fetch.MediatorFetcher
 import com.seagroup.seatalk.shopil.request.ImageRequest
+import com.seagroup.seatalk.shopil.request.ImageSource
+import com.seagroup.seatalk.shopil.transform.TransformerImpl
 import com.seagroup.seatalk.shopil.util.MemoryUtils
 import com.seagroup.seatalk.shopil.util.StorageUtils
 import okhttp3.Call
@@ -30,18 +34,19 @@ interface ImageLoader : CacheManager {
                 memoryCache = DefaultMemoryCache(MemoryUtils.calculateAvailableMemorySize(appContext)),
                 diskCache = DefaultDiskCache(StorageUtils.getDefaultCacheDirectory(appContext))
             ),
-            dataFetcherManager = createDataFetcherManager()
+            fetcher = createFetcher(),
+            decoder = StreamBitmapDecoder(),
+            transformer = TransformerImpl()
         )
 
-        private fun createDataFetcherManager(): DataFetcherManager {
+        private fun createFetcher(): Fetcher<ImageSource> {
             val callFactory = lazyCallFactory {
                 OkHttpClient.Builder()
-//                    .cache(StorageUtils.createDefaultCache(appContext))
+                    //                    .cache(StorageUtils.createDefaultCache(appContext))
                     .build()
             }
             val httpFetcher = HttpFetcher(callFactory)
-            return DataFetcherManager(
-                drawableFetcher = DrawableFetcher(),
+            return MediatorFetcher(
                 contentUriFetcher = ContentUriFetcher(appContext),
                 fileFetcher = FileFetcher(),
                 httpUriFetcher = HttpUriFetcher(httpFetcher),

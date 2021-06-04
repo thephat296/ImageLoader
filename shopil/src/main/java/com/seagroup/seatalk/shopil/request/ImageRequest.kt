@@ -13,19 +13,18 @@ class ImageRequest(
     val transformations: List<Transformation>? = null
 ) {
 
-    val cacheKey: CacheKey? by lazy { buildKey() }
+    val cacheKey: CacheKey by lazy { buildKey() }
 
-    private fun buildKey(): CacheKey? {
+    private fun buildKey(): CacheKey {
         val size = imageView.requireSize()
         val transformations = transformations?.mapNotNull {
             it.javaClass.canonicalName
         }
         val sourceKey = when (source) {
-            is ImageSource.Drawable -> null // no need to cache
             is ImageSource.File -> source.data.path
             is ImageSource.Uri -> source.data.toString()
             is ImageSource.Url -> source.data
-        } ?: return null
+        }
         return CacheKey(sourceKey, size, transformations)
     }
 

@@ -6,9 +6,9 @@ import android.widget.ImageView
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlin.coroutines.resume
 
-internal suspend fun ImageView.awaitSize(): Size {
+internal suspend fun ImageView.awaitViewToBeMeasured() {
     // the view is already measured.
-    getSize()?.let { return it }
+    getSize()?.let { return }
 
     // wait for the view to be measured.
     return suspendCancellableCoroutine { continuation ->
@@ -17,11 +17,11 @@ internal suspend fun ImageView.awaitSize(): Size {
             private var isResumed = false
 
             override fun onPreDraw(): Boolean {
-                val size = getSize() ?: return true
+                getSize() ?: return true
                 viewTreeObserver.removeOnPreDrawListener(this)
                 if (!isResumed) {
                     isResumed = true
-                    continuation.resume(size)
+                    continuation.resume(Unit)
                 }
                 return true
             }

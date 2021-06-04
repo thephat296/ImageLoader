@@ -5,25 +5,24 @@ import android.content.ContentResolver.SCHEME_FILE
 import android.net.Uri
 import com.seagroup.seatalk.shopil.Result
 import com.seagroup.seatalk.shopil.request.ImageSource
+import okio.BufferedSource
 
 @Suppress("UNCHECKED_CAST")
-internal class DataFetcherManager(
-    private val drawableFetcher: DrawableFetcher,
+internal class MediatorFetcher(
     private val contentUriFetcher: ContentUriFetcher,
     private val fileFetcher: FileFetcher,
     private val httpUriFetcher: HttpUriFetcher,
     private val httpUrlFetcher: HttpUrlFetcher,
     private val fileUriFetcher: FileUriFetcher
-) {
+) : Fetcher<ImageSource> {
 
-    suspend fun fetch(imageSource: ImageSource): Result<FetchData> {
-        val fetcher = imageSource.getFetcher()
-            ?: return Result.Error(IllegalArgumentException("Unsupported ImageSource[$imageSource]"))
-        return fetcher.fetch(imageSource)
+    override suspend fun fetch(source: ImageSource): Result<BufferedSource> {
+        val fetcher = source.getFetcher()
+            ?: return Result.Error(IllegalArgumentException("Unsupported ImageSource[$source]"))
+        return fetcher.fetch(source)
     }
 
     private fun ImageSource.getFetcher(): Fetcher<ImageSource>? = when (this) {
-        is ImageSource.Drawable -> drawableFetcher
         is ImageSource.File -> fileFetcher
         is ImageSource.Uri -> data.getUriFetcher()
         is ImageSource.Url -> httpUrlFetcher
