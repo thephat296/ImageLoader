@@ -43,7 +43,7 @@ internal class ImageLoaderImpl(
     override fun enqueue(request: ImageRequest) {
         fun setImage(drawable: Drawable?) = request.imageView.setImageDrawable(drawable)
         scope.launch {
-            request.imageView.awaitViewToBeMeasured()
+            request.imageView.awaitViewToBeMeasured() // TODO: not work if the view width and height are set to wrap_content
 
             request.placeholder?.getDrawable(appContext)?.let(::setImage)
             withContext(Dispatchers.IO) {
