@@ -2,6 +2,7 @@ package com.seagroup.seatalk.shopil.request
 
 import android.widget.ImageView
 import com.seagroup.seatalk.shopil.cache.CacheKey
+import com.seagroup.seatalk.shopil.cache.CachePolicy
 import com.seagroup.seatalk.shopil.transform.Transformation
 import com.seagroup.seatalk.shopil.util.requireSize
 
@@ -10,10 +11,12 @@ class ImageRequest(
     val imageView: ImageView,
     val placeholder: ImageResource? = null,
     val error: ImageResource? = null,
-    val transformations: List<Transformation>? = null
+    val transformations: List<Transformation>? = null,
+    val memoryCachePolicy: CachePolicy,
+    val diskCachePolicy: CachePolicy
 ) {
 
-    val cacheKey: CacheKey by lazy { buildKey() }
+    val cacheKey: CacheKey by lazy(::buildKey)
 
     private fun buildKey(): CacheKey {
         val size = imageView.requireSize()
@@ -36,6 +39,8 @@ class ImageRequest(
         private var placeholder: ImageResource? = null
         private var error: ImageResource? = null
         private var transformations: List<Transformation>? = null
+        private var memoryCachePolicy: CachePolicy = CachePolicy.ENABLED
+        private var diskCachePolicy: CachePolicy = CachePolicy.ENABLED
 
         fun placeholder(placeholder: ImageResource) = apply {
             this.placeholder = placeholder
@@ -49,12 +54,22 @@ class ImageRequest(
             this.transformations = transformations.toList()
         }
 
+        fun memoryCachePolicy(cachePolicy: CachePolicy) = apply {
+            this.memoryCachePolicy = cachePolicy
+        }
+
+        fun diskCachePolicy(cachePolicy: CachePolicy) = apply {
+            this.diskCachePolicy = cachePolicy
+        }
+
         fun build() = ImageRequest(
             source = source,
             imageView = imageView,
             placeholder = placeholder,
             error = error,
-            transformations = transformations
+            transformations = transformations,
+            memoryCachePolicy = memoryCachePolicy,
+            diskCachePolicy = diskCachePolicy
         )
     }
 }

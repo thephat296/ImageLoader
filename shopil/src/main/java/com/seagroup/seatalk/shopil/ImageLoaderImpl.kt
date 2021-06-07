@@ -47,7 +47,7 @@ internal class ImageLoaderImpl(
 
             request.placeholder?.getDrawable(appContext)?.let(::setImage)
             withContext(Dispatchers.IO) {
-                (getCache(request.cacheKey) ?: fetchImage(request))
+                (getCache(request) ?: fetchImage(request))
                     ?.toDrawable(appContext.resources)
                     ?: request.error?.getDrawable(appContext)
             }.let(::setImage)
@@ -65,7 +65,7 @@ internal class ImageLoaderImpl(
                 transform(bitmap, request.transformations)
             }
             .doOnSuccess { bitmap ->
-                putCache(request.cacheKey, bitmap)
+                putCache(request, bitmap)
             }
             .doOnError(Timber::d)
             .data
