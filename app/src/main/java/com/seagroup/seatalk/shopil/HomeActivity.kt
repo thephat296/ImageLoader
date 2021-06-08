@@ -6,6 +6,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.seagroup.seatalk.shopil.databinding.ActivityHomeBinding
+import com.seagroup.seatalk.shopil.util.imageLoader
 import kotlinx.coroutines.launch
 
 class HomeActivity : AppCompatActivity() {
@@ -28,11 +29,11 @@ class HomeActivity : AppCompatActivity() {
             viewModel.loadImages().observe(this, listAdapter::submitList)
         }
         binding.btnClearMemoryCache.setOnClickListener {
-            (application as AndroidApplication).imageLoader.clearMemoryCache()
+            imageLoader.clearMemoryCache()
         }
         binding.btnClearDiskCache.setOnClickListener {
             lifecycleScope.launch {
-                (application as AndroidApplication).imageLoader.clearDiskCache()
+                imageLoader.clearDiskCache()
             }
         }
     }

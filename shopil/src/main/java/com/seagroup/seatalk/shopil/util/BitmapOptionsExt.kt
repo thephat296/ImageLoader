@@ -8,7 +8,8 @@ internal fun BitmapFactory.Options.resize(srcSize: Size, dstSize: Size) {
     inSampleSize = BitmapUtils.calculateInSampleSize(srcSize, dstSize)
     val scale = BitmapUtils
         .calculateSizeScale(srcSize = srcSize.scaleDownTo(inSampleSize), dstSize = dstSize)
-        .coerceAtMost(1.0) // Avoid loading the image larger than its original dimensions
+        .takeIf { it < 1.0 } // Avoid loading the image larger than its original dimensions
+        ?: return
     inScaled = true
     inDensity = srcSize.width
     inTargetDensity = (inDensity * scale).roundToInt()

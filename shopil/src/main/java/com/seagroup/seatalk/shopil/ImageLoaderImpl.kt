@@ -8,6 +8,7 @@ import com.seagroup.seatalk.shopil.cache.CacheManager
 import com.seagroup.seatalk.shopil.decode.DecodeParams
 import com.seagroup.seatalk.shopil.decode.Decoder
 import com.seagroup.seatalk.shopil.fetch.Fetcher
+import com.seagroup.seatalk.shopil.request.ImageJobManager
 import com.seagroup.seatalk.shopil.request.ImageRequest
 import com.seagroup.seatalk.shopil.request.ImageSource
 import com.seagroup.seatalk.shopil.transform.Transformer
@@ -42,8 +43,8 @@ internal class ImageLoaderImpl(
 
     override fun enqueue(request: ImageRequest) {
         fun setImage(drawable: Drawable?) = request.imageView.setImageDrawable(drawable)
-        scope.launch {
-            request.imageView.awaitViewToBeMeasured() // TODO: not work if the view width and height are set to wrap_content
+        val job = scope.launch {
+            request.imageView.awaitViewToBeMeasured()
 
             request.placeholder?.getDrawable(appContext)?.let(::setImage)
             withContext(Dispatchers.IO) {
@@ -52,6 +53,7 @@ internal class ImageLoaderImpl(
                     ?: request.error?.getDrawable(appContext)
             }.let(::setImage)
         }
+        ImageJobManager(job, request.imageView)
     }
 
     private suspend fun fetchImage(request: ImageRequest): Bitmap? =

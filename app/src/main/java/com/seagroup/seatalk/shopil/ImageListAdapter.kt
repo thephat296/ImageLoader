@@ -8,8 +8,8 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.seagroup.seatalk.shopil.databinding.ItemImageBinding
 import com.seagroup.seatalk.shopil.request.ImageResource
-import com.seagroup.seatalk.shopil.request.ImageSource
 import com.seagroup.seatalk.shopil.transform.BlurTransformation
+import com.seagroup.seatalk.shopil.util.load
 
 typealias Url = String
 
@@ -22,7 +22,7 @@ class ImageListAdapter(
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        holder.binding.root.load(source = ImageSource.Url(getItem(position))) {
+        holder.binding.root.load(url = getItem(position)) {
             placeholder(ImageResource.DrawableRes(R.drawable.ic_launcher_background))
             error(ImageResource.DrawableRes(R.drawable.ic_launcher_foreground))
             transformations(BlurTransformation(context))
