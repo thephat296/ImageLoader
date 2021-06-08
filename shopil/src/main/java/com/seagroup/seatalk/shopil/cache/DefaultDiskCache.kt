@@ -7,9 +7,10 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import timber.log.Timber
 import java.io.File
+import java.util.concurrent.ConcurrentHashMap
 
 internal class DefaultDiskCache(private val cacheDir: File) : DiskCache {
-    private val locks = HashMap<CacheKey, Mutex>()
+    private val locks = ConcurrentHashMap<CacheKey, Mutex>()
     private val safeCacheDir: File
         get() = cacheDir.apply { mkdirs() }
 
@@ -23,7 +24,7 @@ internal class DefaultDiskCache(private val cacheDir: File) : DiskCache {
             if (file.exists()) file.delete()
             try {
                 file.outputStream().use {
-                    bitmap.compress(Bitmap.CompressFormat.JPEG, 100, it)
+                    bitmap.compress(Bitmap.CompressFormat.PNG, 100, it)
                     it.flush()
                 }
             } catch (e: Exception) {
@@ -43,7 +44,6 @@ internal class DefaultDiskCache(private val cacheDir: File) : DiskCache {
             File(safeCacheDir, key.toFileName()).delete()
         }
 
-    @Synchronized
     override suspend fun clear() {
         cacheDir.deleteRecursively()
     }

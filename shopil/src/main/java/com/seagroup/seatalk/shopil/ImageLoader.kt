@@ -19,8 +19,8 @@ import com.seagroup.seatalk.shopil.request.ImageSource
 import com.seagroup.seatalk.shopil.transform.TransformerImpl
 import com.seagroup.seatalk.shopil.util.MemoryUtils
 import com.seagroup.seatalk.shopil.util.StorageUtils
-import okhttp3.Call
 import okhttp3.OkHttpClient
+import java.util.concurrent.TimeUnit
 
 interface ImageLoader : CacheManager {
     fun enqueue(request: ImageRequest)
@@ -40,11 +40,12 @@ interface ImageLoader : CacheManager {
         )
 
         private fun createFetcher(): Fetcher<ImageSource> {
-            val callFactory = lazyCallFactory {
+            val callFactory =
                 OkHttpClient.Builder()
                     //                    .cache(StorageUtils.createDefaultCache(appContext))
+                    .connectTimeout(CONNECTION_TIME_OUT, TimeUnit.SECONDS)
+                    .readTimeout(READ_TIME_OUT, TimeUnit.SECONDS)
                     .build()
-            }
             val httpFetcher = HttpFetcher(callFactory)
             return MediatorFetcher(
                 contentUriFetcher = ContentUriFetcher(appContext),
@@ -54,10 +55,10 @@ interface ImageLoader : CacheManager {
                 fileUriFetcher = FileUriFetcher()
             )
         }
+    }
 
-        private fun lazyCallFactory(initializer: () -> Call.Factory): Call.Factory {
-            val lazy: Lazy<Call.Factory> = lazy(initializer)
-            return Call.Factory(lazy.value::newCall)
-        }
+    companion object {
+        private const val CONNECTION_TIME_OUT = 30L
+        private const val READ_TIME_OUT = 30L
     }
 }

@@ -9,6 +9,8 @@ object ImageLoaderFactory {
 
     @Synchronized
     private fun createImageLoader(context: Context): ImageLoader {
+        imageLoader?.let { return it }
+
         val appContext = context.applicationContext
         return ((appContext as? Creator)?.createImageLoader() ?: ImageLoader.Builder(appContext).build())
             .also { imageLoader = it }
