@@ -61,4 +61,9 @@ interface ImageLoader : CacheManager {
         private const val CONNECTION_TIME_OUT = 30L
         private const val READ_TIME_OUT = 30L
     }
+
+    companion object {
+        private const val CONNECTION_TIME_OUT = 10L
+        private const val READ_TIME_OUT = 10L
+    }
 }

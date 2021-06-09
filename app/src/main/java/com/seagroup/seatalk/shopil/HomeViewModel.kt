@@ -27,7 +27,7 @@ class HomeViewModel : ViewModel() {
     }
 
     companion object {
-        private const val URL_IMAGES = "https://picsum.photos/v2/list?page=2&limit=100"
+        private const val URL_IMAGES = "https://picsum.photos/v2/list?page=2&limit=50"
         private const val KEY_DOWNLOAD_URL = "download_url"
     }
 }
