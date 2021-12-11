@@ -1,7 +1,6 @@
 package com.vtp.imageloader.demo
 
 import android.os.Bundle
-import android.view.ViewGroup
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
@@ -9,7 +8,6 @@ import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.vtp.imageloader.demo.databinding.ActivityHomeBinding
 import com.vtplib.imageloader.util.imageLoader
 import kotlinx.coroutines.launch
-import java.util.concurrent.TimeUnit
 
 class HomeActivity : AppCompatActivity() {
 
@@ -26,12 +24,14 @@ class HomeActivity : AppCompatActivity() {
 
         with(binding.rvImages) {
             adapter = listAdapter
-            layoutManager = StaggeredGridLayoutManager(ImageListAdapter.NUM_COLUMNS, StaggeredGridLayoutManager.VERTICAL)
+            layoutManager = StaggeredGridLayoutManager(
+                ImageListAdapter.NUM_COLUMNS,
+                StaggeredGridLayoutManager.VERTICAL
+            )
             addItemDecoration(ImageItemDecoration(this@HomeActivity))
         }
         binding.btnLoadImages.setOnClickListener {
             viewModel.loadImages().observe(this) {
-                trackLastRenderTime()
                 listAdapter.submitList(it)
             }
         }
@@ -42,14 +42,6 @@ class HomeActivity : AppCompatActivity() {
             lifecycleScope.launch {
                 imageLoader.clearDiskCache()
             }
-        }
-    }
-
-    private fun trackLastRenderTime() {
-        val start = System.currentTimeMillis()
-        findViewById<ViewGroup>(android.R.id.content).viewTreeObserver.addOnDrawListener {
-            val end = System.currentTimeMillis() - start
-            binding.tvLastDraw.text = TimeUnit.MILLISECONDS.toSeconds(end).toString()
         }
     }
 }
