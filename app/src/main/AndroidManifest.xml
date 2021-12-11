@@ -11,8 +11,8 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.ShopIl">
-        <activity android:name="com.vtp.imageloader.demo.MainActivity">
+        android:theme="@style/Theme.ImageLoader">
+        <activity android:name="com.vtp.imageloader.demo.HomeActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
