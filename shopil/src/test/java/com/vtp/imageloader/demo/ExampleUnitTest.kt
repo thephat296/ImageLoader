@@ -1,4 +1,4 @@
-package com.seagroup.seatalk.shopil
+package com.vtp.imageloader.demo
 
 import org.junit.Assert.assertEquals
 import org.junit.Test

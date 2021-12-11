@@ -1,4 +1,4 @@
-package com.seagroup.seatalk.shopil
+package com.vtp.imageloader.demo
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
@@ -17,6 +17,6 @@ class ExampleInstrumentedTest {
     fun useAppContext() {
         // Context of the app under test.
         val appContext = InstrumentationRegistry.getInstrumentation().targetContext
-        assertEquals("com.seagroup.seatalk.shopil", appContext.packageName)
+        assertEquals("com.seagroup.seatalk.shopil.test", appContext.packageName)
     }
 }

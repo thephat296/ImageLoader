@@ -1,4 +1,4 @@
-package com.seagroup.seatalk.shopil
+package com.vtp.imageloader.demo
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
