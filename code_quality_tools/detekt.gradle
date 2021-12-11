@@ -1,0 +1,43 @@
+buildscript {
+    repositories {
+        gradlePluginPortal()
+    }
+    dependencies {
+        classpath "io.gitlab.arturbosch.detekt:detekt-gradle-plugin:1.19.0"
+    }
+}
+
+apply plugin: 'io.gitlab.arturbosch.detekt'
+
+def detektVersion = '1.19.0'
+detekt {
+    toolVersion = "$detektVersion"
+    input = files(projectDir)
+    config = files("$project.rootDir/code_quality_tools/detekt-ruleset.yml")
+    baseline = file("$project.rootDir/code_quality_tools/detekt-baseline.xml")
+
+    def outputReportFolderPath = "$buildDir/reports/code_quality_tools"
+    reports {
+        html {
+            enabled = false
+            destination = file("$outputReportFolderPath/detekt-results.html")
+        }
+        xml {
+            enabled = true
+            destination = file("$outputReportFolderPath/detekt-results.xml")
+        }
+        txt {
+            enabled = false
+            destination = file("$outputReportFolderPath/detekt-results.txt")
+        }
+    }
+
+    failFast = false
+    autoCorrect = false
+    parallel = true
+    ignoreFailures = true
+}
+
+dependencies {
+    detektPlugins "io.gitlab.arturbosch.detekt:detekt-formatting:$detektVersion"
+}

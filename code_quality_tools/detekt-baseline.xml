@@ -1,0 +1,7 @@
+<?xml version="1.0" ?>
+<SmellBaseline>
+  <ManuallySuppressedIssues></ManuallySuppressedIssues>
+  <CurrentIssues>
+    <ID>TooGenericExceptionCaught:BaseFetcher.kt$BaseFetcher$e: Throwable</ID>
+  </CurrentIssues>
+</SmellBaseline>

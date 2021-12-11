@@ -1,0 +1,12 @@
+android {
+    lintOptions {
+        disable 'GradleDependency'
+        quiet true
+        abortOnError false
+        ignoreWarnings true
+        checkDependencies true
+        xmlReport true
+        htmlReport false
+        xmlOutput file("$project.rootDir/build/reports/code_quality_tools/lint-result.xml")
+    }
+}

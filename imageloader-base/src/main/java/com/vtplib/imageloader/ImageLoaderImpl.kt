@@ -18,7 +18,7 @@ import kotlinx.coroutines.*
 import timber.log.Timber
 
 internal class ImageLoaderImpl(
-    private val appContext: Context,
+            private val appContext: Context,
     cacheManager: CacheManager,
     fetcher: Fetcher<ImageSource>,
     decoder: Decoder,
