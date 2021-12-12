@@ -24,6 +24,8 @@ detekt {
     toolVersion = "1.19.0"
     config = files("config/detekt/detekt.yml")
     buildUponDefaultConfig = true
+    input = files("$projectDir")
+    baseline = file("config/detekt/detekt-baseline.xml")
 }
 
 dependencies {

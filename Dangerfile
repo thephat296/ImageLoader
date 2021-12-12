@@ -12,6 +12,18 @@ warn("Big PR") if git.lines_of_code > 500
 fail("fdescribe left in tests") if `grep -r fdescribe specs/ `.length > 1
 fail("fit left in tests") if `grep -r fit specs/ `.length > 1
 
+## Run detekt
+# Run detection on files that added or changed only and comment automatically
+kotlin_files = (git.added_files + git.modified_files).select{ |file| file.end_with?(".kt", ".kts") }
+
+unless kotlin_files.empty?
+  puts `./gradlew detekt`
+  checkstyle_format.base_path = Dir.pwd
+  checkstyle_format.report "build/reports/detekt/detekt.xml"
+else
+  puts 'No changed kotlin files in this MR so Detekt will not run'
+end
+
 ## Android lint
 puts 'Begin task runChecksForDanger'
 puts `./gradlew runChecksForDanger`
