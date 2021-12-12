@@ -18,8 +18,8 @@ import kotlinx.coroutines.*
 import timber.log.Timber
 
 internal class ImageLoaderImpl(
-        private val appContext: Context,
-        cacheManager: CacheManager,
+    private val appContext: Context,
+    cacheManager: CacheManager,
     fetcher: Fetcher<ImageSource>,
     decoder: Decoder,
     transformer: Transformer
@@ -31,7 +31,7 @@ internal class ImageLoaderImpl(
 
     private val scope = CoroutineScope(
         SupervisorJob() + Dispatchers.Main.immediate +
-                CoroutineExceptionHandler { _, throwable -> Timber.d(throwable) }
+            CoroutineExceptionHandler { _, throwable -> Timber.d(throwable) }
     )
 
     override fun enqueue(request: ImageRequest) {
