@@ -3,6 +3,8 @@ plugins {
     id 'kotlin-android'
 }
 
+apply from: "$project.rootDir/code_quality_tools/lint.gradle"
+
 android {
     compileSdkVersion 30
     buildToolsVersion "30.0.3"
@@ -52,10 +54,4 @@ dependencies {
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.2'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
-}
-
-task runChecksForDanger() {
-    group = "Reporting"
-    dependsOn 'ktlintCheck'
-    dependsOn 'lint'
 }

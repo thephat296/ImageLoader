@@ -14,5 +14,6 @@ on:
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
   call_commit_workflow:
+    if: always()
     uses: thephat296/ImageLoader/.github/workflows/commit.yml@image-loader
 

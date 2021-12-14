@@ -9,28 +9,17 @@ buildscript {
     dependencies {
         classpath "com.android.tools.build:gradle:4.2.1"
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
-        classpath "org.jlleitschuh.gradle:ktlint-gradle:10.1.0"
-        classpath "io.gitlab.arturbosch.detekt:detekt-gradle-plugin:1.19.0"
 
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files
     }
 }
 
-
-apply plugin: 'io.gitlab.arturbosch.detekt'
-
-detekt {
-    toolVersion = "1.19.0"
-    config = files("config/detekt/detekt.yml")
-    buildUponDefaultConfig = true
-    input = files("$projectDir")
-    baseline = file("config/detekt/detekt-baseline.xml")
+plugins {
+    id "io.gitlab.arturbosch.detekt" version "1.6.0"
 }
 
-dependencies {
-    detektPlugins "io.gitlab.arturbosch.detekt:detekt-formatting:1.19.0"
-}
+apply from: 'code_quality_tools/detekt.gradle'
 
 allprojects {
     repositories {
@@ -38,14 +27,6 @@ allprojects {
         mavenCentral()
         jcenter() // Warning: this repository is going to shut down soon
         maven { url 'https://jitpack.io' }
-    }
-
-    apply plugin: "org.jlleitschuh.gradle.ktlint"
-
-    // Optionally configure plugin
-    ktlint {
-        debug.set(true)
-        disabledRules.set(["no-wildcard-imports"])
     }
 }
 
