@@ -37,13 +37,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v1
-      - name: cache reports
-        uses: actions/cache@v1
-        with:
-          path: build/reports/code_quality_tools
-          key: ${{ runner.os }}-reports-${{ hashFiles('detekt.xml') }}
-          restore-keys: |
-            ${{ runner.os }}-reports-
       - name: run detekt
         run: bash ./gradlew detekt
 
